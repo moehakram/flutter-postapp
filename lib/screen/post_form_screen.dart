@@ -2,17 +2,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:posts_app_241117/resource/remote_resource.dart';
+import '../resource/remote_resource.dart';
 import '../cubit/post_cubit.dart';
 import '../model/post.dart';
 
 class PostFormScreen extends StatefulWidget {
   final Post? post;
 
-  const PostFormScreen({Key? key, this.post}) : super(key: key);
+  const PostFormScreen({super.key, this.post});
 
   @override
-  _PostFormScreenState createState() => _PostFormScreenState();
+  State<PostFormScreen> createState() => _PostFormScreenState();
 }
 
 class _PostFormScreenState extends State<PostFormScreen> {

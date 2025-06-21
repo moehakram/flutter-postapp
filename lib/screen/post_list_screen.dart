@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:posts_app_241117/resource/remote_resource.dart';
+import 'package:posts_app_241117/screen/post_detail_page.dart';
 import '../cubit/post_cubit.dart';
 import '../model/post.dart';
 import 'post_form_screen.dart';
 
 class PostListScreen extends StatefulWidget {
   @override
-  _PostListScreenState createState() => _PostListScreenState();
+  State<PostListScreen> createState() => _PostListScreenState();
 }
 
 class _PostListScreenState extends State<PostListScreen> {
@@ -53,6 +54,15 @@ class _PostListScreenState extends State<PostListScreen> {
                   post: post,
                   onEdit: () => _navigateToForm(context, post),
                   onDelete: () => _showDeleteDialog(context, post),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            PostDetailPage(post: post),
+                      ),
+                    );
+                  },
                 );
               },
             );
@@ -126,19 +136,22 @@ class PostCard extends StatelessWidget {
   final Post post;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onTap;
 
   const PostCard({
-    Key? key,
+    super.key,
     required this.post,
     required this.onEdit,
     required this.onDelete,
-  }) : super(key: key);
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(8.0),
       child: ListTile(
+        onTap: onTap,
         leading: post.image != null
             ? CircleAvatar(
                 backgroundImage: NetworkImage(

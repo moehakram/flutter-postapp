@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:either_dart/either.dart';
 import '../model/post_action_response.dart';
-import '../model/post.dart';
 
 class RemoteResource {
   static const String baseUrl = 'http://postsapi.test:8000/api';
@@ -46,7 +45,7 @@ class RemoteResource {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final jsonData = json.decode(response.body);
         return Right(PostActionResponse.fromJson(jsonData));
       } else {
