@@ -48,14 +48,62 @@ class _PostFormScreenState extends State<PostFormScreen> {
           }
         },
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
+                Column(
+                  children: [
+                    _imageFile != null
+                        ? Image.file(
+                            _imageFile!,
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )
+                        : widget.post?.image != null
+                        ? Image.network(
+                            '${RemoteResource.baseStorage}/${widget.post!.image}',
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            height: 200,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.image,
+                                size: 50,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+
+                    const SizedBox(height: 8),
+
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: Icon(Icons.image_search),
+                      label: Text('Pick Image'),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 44),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
                 TextFormField(
                   controller: _titleController,
-                  decoration: InputDecoration(labelText: 'Title'),
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    border: OutlineInputBorder(),
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a title';
@@ -63,10 +111,14 @@ class _PostFormScreenState extends State<PostFormScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _contentController,
-                  decoration: InputDecoration(labelText: 'Content'),
+                  decoration: const InputDecoration(
+                    labelText: 'Content',
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                  ),
                   maxLines: 5,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -75,45 +127,32 @@ class _PostFormScreenState extends State<PostFormScreen> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _imageFile != null
-                          ? Image.file(
-                              _imageFile!,
-                              height: 100,
-                              fit: BoxFit.cover,
-                            )
-                          : widget.post?.image != null
-                          ? Image.network(
-                              '${RemoteResource.baseStorage}/${widget.post!.image}',
-                              height: 100,
-                              fit: BoxFit.cover,
-                            )
-                          : Container(
-                              height: 100,
-                              color: Colors.grey[300],
-                              child: Icon(Icons.image, size: 50),
-                            ),
-                    ),
-                    SizedBox(width: 16),
-                    ElevatedButton(
-                      onPressed: _pickImage,
-                      child: Text('Pick Image'),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
                 BlocBuilder<PostCubit, PostState>(
                   builder: (context, state) {
+                    if (state is PostActionLoading) {
+                      return ElevatedButton.icon(
+                        onPressed: null,
+                        icon: const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        label: const Text('Processing...'),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 48),
+                        ),
+                      );
+                    }
                     return ElevatedButton(
-                      onPressed: state is PostActionLoading
-                          ? null
-                          : _submitForm,
-                      child: state is PostActionLoading
-                          ? CircularProgressIndicator()
-                          : Text(widget.post == null ? 'Create' : 'Update'),
+                      onPressed: _submitForm,
+                      child: Text(widget.post == null ? 'Create' : 'Update'),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
                     );
                   },
                 ),

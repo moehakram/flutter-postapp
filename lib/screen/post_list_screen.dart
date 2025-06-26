@@ -158,7 +158,7 @@ class PostCard extends StatelessWidget {
                   '${RemoteResource.baseStorage}/${post.image}',
                 ),
               )
-            : CircleAvatar(child: Icon(Icons.article)),
+            : CircleAvatar(child: Icon(Icons.broken_image)),
         title: Text(post.title ?? 'No Title'),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
