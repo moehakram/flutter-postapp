@@ -39,3 +39,13 @@ class PostActionSuccess extends PostState {
   @override
   List<Object> get props => [message];
 }
+
+class PostUpdateSuccess extends PostState {
+  final Post post;
+  final String message;
+
+  const PostUpdateSuccess(this.post, this.message);
+
+  @override
+  List<Object> get props => [post, message];
+}

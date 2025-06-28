@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import '../resource/remote_resource.dart';
 import '../cubit/post_cubit.dart';
 import '../model/post.dart';
 
@@ -26,8 +25,8 @@ class _PostFormScreenState extends State<PostFormScreen> {
   void initState() {
     super.initState();
     if (widget.post != null) {
-      _titleController.text = widget.post!.title ?? '';
-      _contentController.text = widget.post!.content ?? '';
+      _titleController.text = widget.post!.title;
+      _contentController.text = widget.post!.content;
     }
   }
 
@@ -39,7 +38,7 @@ class _PostFormScreenState extends State<PostFormScreen> {
       ),
       body: BlocListener<PostCubit, PostState>(
         listener: (context, state) {
-          if (state is PostActionSuccess) {
+          if (state is PostActionSuccess || state is PostUpdateSuccess) {
             Navigator.pop(context);
           } else if (state is PostError) {
             ScaffoldMessenger.of(
@@ -64,7 +63,7 @@ class _PostFormScreenState extends State<PostFormScreen> {
                           )
                         : widget.post?.image != null
                         ? Image.network(
-                            '${RemoteResource.baseStorage}/${widget.post!.image}',
+                            '${widget.post!.imageUrl}',
                             height: 200,
                             width: double.infinity,
                             fit: BoxFit.cover,
@@ -149,10 +148,10 @@ class _PostFormScreenState extends State<PostFormScreen> {
                     }
                     return ElevatedButton(
                       onPressed: _submitForm,
-                      child: Text(widget.post == null ? 'Create' : 'Update'),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 48),
                       ),
+                      child: Text(widget.post == null ? 'Create' : 'Update'),
                     );
                   },
                 ),
@@ -182,7 +181,6 @@ class _PostFormScreenState extends State<PostFormScreen> {
           imageFile: _imageFile,
         );
       } else {
-        // Check if post ID is not null before updating
         if (widget.post!.slug != null) {
           context.read<PostCubit>().updatePost(
             slug: widget.post!.slug!,

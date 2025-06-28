@@ -2,18 +2,18 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../model/post.dart';
-import '../resource/remote_resource.dart';
+import '../services/post_service.dart';
 
 part 'post_state.dart';
 
 class PostCubit extends Cubit<PostState> {
-  final RemoteResource _remoteResource;
+  final PostService _postService;
 
-  PostCubit(this._remoteResource) : super(PostInitial());
+  PostCubit(this._postService) : super(PostInitial());
 
   Future<void> fetchPosts() async {
     emit(PostLoading());
-    final result = await _remoteResource.getPosts();
+    final result = await _postService.getPosts();
 
     result.fold((error) => emit(PostError(error)), (response) {
       if (response.success == true && response.data != null) {
@@ -30,7 +30,7 @@ class PostCubit extends Cubit<PostState> {
     File? imageFile,
   }) async {
     emit(PostActionLoading());
-    final result = await _remoteResource.createPost(
+    final result = await _postService.createPost(
       title: title,
       content: content,
       imageFile: imageFile,
@@ -55,7 +55,7 @@ class PostCubit extends Cubit<PostState> {
     File? imageFile,
   }) async {
     emit(PostActionLoading());
-    final result = await _remoteResource.updatePost(
+    final result = await _postService.updatePost(
       slug: slug,
       title: title,
       content: content,
@@ -64,10 +64,13 @@ class PostCubit extends Cubit<PostState> {
 
     result.fold((error) => emit(PostError(error)), (response) {
       if (response.success == true) {
+        fetchPosts();
         emit(
-          PostActionSuccess(response.message ?? 'Post updated successfully'),
+          PostUpdateSuccess(
+            response.data!,
+            response.message ?? 'Post updated successfully',
+          ),
         );
-        fetchPosts(); // Refresh the list
       } else {
         emit(PostError(response.message ?? 'Failed to update post'));
       }
@@ -76,7 +79,7 @@ class PostCubit extends Cubit<PostState> {
 
   Future<void> deletePost(String slug) async {
     emit(PostActionLoading());
-    final result = await _remoteResource.deletePost(slug);
+    final result = await _postService.deletePost(slug);
 
     result.fold((error) => emit(PostError(error)), (response) {
       if (response.success == true) {
